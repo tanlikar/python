@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[9]:
+# In[17]:
 
 
 import matplotlib.pyplot as plt
@@ -24,7 +24,14 @@ for x in range (len(sensor)):
     dataframe_collection[x].columns = ['Time', sensor[x]]
     dataframe_collection[x] = dataframe_collection[x].sort_values(by='Time')
     dataframe_collection[x].Time = pd.to_datetime(dataframe_collection[x].Time)
-
+    
+    if(x==0):
+        dataframe_collection[x] = dataframe_collection[x][dataframe_collection[x].temperature <= 100]
+    elif(x==1):
+        dataframe_collection[x] = dataframe_collection[x][dataframe_collection[x].humi != 0]
+    elif(x==4):
+        dataframe_collection[x] = dataframe_collection[x][dataframe_collection[x].co2 <= 10000]
+            
 
 for x in range(len(sensor)):
     a =pd.DatetimeIndex(dataframe_collection[x]['Time']).month
@@ -54,13 +61,11 @@ def plotGraph (name,month, date, df):
     #filter by date
     df.set_index('Time', inplace=True)    
     df =  df.loc[(month + ' ' + date + ' '+ '08:00:00 2018'): (month + ' ' + date + ' '+ '17:30:00 2018')]
-    df.reset_index(inplace=True)
-    
-    
+   
     df[name].plot(figsize=(20,10), linewidth =2, fontsize=14)
     plt.xlabel('Time', fontsize=20);
     plt.ylabel(name, fontsize=20);
-   # plt.show()
+    df.reset_index(inplace=True)
         
         
     if df_all.empty:
@@ -222,8 +227,8 @@ for x in range (len(month_day)):
         
 
 
-# In[ ]:
+# In[16]:
 
 
-dataframe_collection[0]
+dataframe_collection[4][dataframe_collection[4].co2 <= 10000]
 
