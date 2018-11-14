@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[69]:
 
 
 import pandas as pd
@@ -10,15 +10,18 @@ import matplotlib.pyplot as plt
 
 df = pd.read_csv('C:/sensor data/temperature.csv')
 df.columns = ['Time', 'temperature']
-date = '7'
-month = 'Nov'
  
-#parse Time column to datetime
+#parse Time column to datetime & convert to index for filtering
 df.Time = pd.to_datetime(df.Time)
 df.set_index('Time', inplace=True)
 
 #filter by date
-df =  df.loc[(month + ' ' + date + ' '+ '08:00:00 2018'): (month + ' ' + date + ' '+ '17:30:00 2018')]
+df =  df.loc[('Nov' + ' ' + '8' + ' '+ '08:00:00 2018'): ('Nov' + ' ' + '8' + ' '+ '17:30:00 2018')]
+#convert back to column
+df.reset_index(level=0, inplace=True)
+#remove duplicate
+df = df.drop_duplicates(subset='Time', keep='last')
+
 
 df_humi = pd.read_csv('C:/sensor data/humi.csv')
 df_humi.columns = ['Time', 'humi']
@@ -26,9 +29,13 @@ df_humi.Time = pd.to_datetime(df_humi.Time)
 df_humi.set_index('Time', inplace=True)
 
 #filter by date
-df_humi =  df_humi.loc[(month + ' ' + date + ' '+ '08:00:00 2018'): (month + ' ' + date + ' '+ '17:30:00 2018')]
+df_humi =  df_humi.loc[('Nov' + ' ' + '8' + ' '+ '08:00:00 2018'): ('Nov' + ' ' + '8' + ' '+ '17:30:00 2018')]
+#convert back to column
+df_humi.reset_index(level=0, inplace=True)
+df_humi = df_humi.drop_duplicates(subset='Time', keep='last')
 
-a = pd.merge(df, df_humi, on=['Time'])
+
+a = pd.merge(left=df, right=df_humi, on=['Time'], how='inner')
 #sort by time
 a = a.sort_values(by='Time')
 
@@ -87,9 +94,13 @@ def calPMV (temp, humi): #iso7730 standard
 #cal PMV for each temp and humi
 b = []    
 for x in range (len(a)):
-    b.append(calPMV((a.iloc[x][0]), (a.iloc[x][1])))
+    b.append(calPMV((a.iloc[x][1]), (a.iloc[x][2])))
 
-df_pmv = pd.DataFrame(b, index = a.index, columns=['PMV'])
+df_pmv = pd.DataFrame()
+df_pmv['Time'] = a['Time']
+df_pmv['PMV'] = b
+c = pd.merge(left=a, right=df_pmv, on=["Time"], how='inner')
+
 
 
 #plot graph
@@ -110,9 +121,9 @@ par2.spines['right'].set_position(('axes', 1.2))
 make_patch_spines_invisible(par2)
 par2.spines['right'].set_visible(True)
 
-p1, = host.plot(a.index, df_pmv['PMV'], 'b-', label='PMV')
-p2, = par1.plot(a.index, a['humi'], 'r-', label='Humidity')
-p3, = par2.plot(a.index, a['temperature'], 'g-', label='Temperature')
+p1, = host.plot(c['Time'], c['PMV'], 'b-', label='PMV')
+p2, = par1.plot(c['Time'], c['humi'], 'r-', label='Humidity')
+p3, = par2.plot(c['Time'], c['temperature'], 'g-', label='Temperature')
 
 host.set_xlabel('Time')
 host.set_ylabel('PMV')
@@ -131,7 +142,68 @@ host.tick_params(axis='x', **tkw)
 
 lines = [p1,p2,p3]
 host.legend(lines, [l.get_label() for l in lines])
-plt.savefig('C:/sensor data/sensor graph/'+month+'-'+date+'-'+'PMV.png')
+plt.savefig('C:/sensor data/sensor graph/Nov-8-PMV.png')
 plt.show()
 
+
+# In[67]:
+
+
+print(c)
+
+
+# In[19]:
+
+
+a.iloc[0][0]
+
+
+# In[47]:
+
+
+c['humi']
+
+
+# In[51]:
+
+
+c.iloc[a][0]
+
+
+# In[68]:
+
+
+myfile = open('C:/sensor data/a.csv', 'w')
+with myfile:
+    myfields = ['Time', 'Temperature', 'humidity', 'PMV']
+    writer = csv.DictWriter(myfile, fieldnames = myfields)
+    writer.writeheader()
+    
+    for d in range (len(c)):
+        writer.writerow({'Time':c.iloc[d][0], 'Temperature':c.iloc[d][1], 'humidity':c.iloc[d][2], 'PMV':c.iloc[d][3]})
+
+
+# In[49]:
+
+
+import csv
+
+
+# In[63]:
+
+
+myfile = open('C:/sensor data/b.csv', 'w')
+with myfile:
+    myfields = ['Time', 'Temperature']
+    writer = csv.DictWriter(myfile, fieldnames = myfields)
+    writer.writeheader()
+    
+    for d in range (len(df)):
+        writer.writerow({'Time':df.iloc[d][0], 'Temperature':df.iloc[d][1]})
+
+
+# In[66]:
+
+
+len(c)
 
