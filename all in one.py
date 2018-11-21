@@ -143,9 +143,12 @@ def myFunc(month, date):
     
     for x in range (len(sensor)):
         try:
-            plt.figure(x)
+            plt.figure()
             plotGraph(sensor[x], month, date, dataframe_collection[x])
             plt.savefig('C:/data/sensor graph/'+ sensor[x] + '-' + month + '-' + date + '.png')
+            plt.cla()
+            plt.clf()
+            plt.close()
         except:
             pass
     
@@ -217,7 +220,10 @@ def myFunc(month, date):
     lines = [p1,p2,p3]
     host.legend(lines, [l.get_label() for l in lines])
     plt.savefig('C:/data/sensor graph/'+month+'-'+date +'-'+'PMV.png')
-    plt.show()
+    plt.cla()
+    plt.clf()
+    plt.close()
+    #plt.show()
  ######################################################################################################
 
 for x in range (len(month_day)):
@@ -230,5 +236,5 @@ for x in range (len(month_day)):
 # In[16]:
 
 
-dataframe_collection[4][dataframe_collection[4].co2 <= 10000]
+#dataframe_collection[4][dataframe_collection[4].co2 <= 10000]
 
