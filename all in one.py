@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[17]:
-
 
 import matplotlib.pyplot as plt
 import datetime as dt
@@ -25,6 +20,7 @@ for x in range (len(sensor)):
     dataframe_collection[x] = dataframe_collection[x].sort_values(by='Time')
     dataframe_collection[x].Time = pd.to_datetime(dataframe_collection[x].Time)
     
+    #remove invalid data
     if(x==0):
         dataframe_collection[x] = dataframe_collection[x][dataframe_collection[x].temperature <= 100]
     elif(x==1):
@@ -40,9 +36,9 @@ for x in range(len(sensor)):
     month_day.append([a[0], b[0]])
     for y in range (len(a)):
         try:
-            if(a[y] != a[y+1]):
-                month_day.append([a[y+1], b[y]])
-            elif(b[y] != b[y+1]):
+            if((a[y] != a[y+1]) and (b[y] != b[y+1])):
+                month_day.append([a[y+1], b[y+1]])
+            elif((a[y] == a[y+1]) and (b[y] != b[y+1])):
                 month_day.append([a[y], b[y+1]])
            
         except:
@@ -232,9 +228,4 @@ for x in range (len(month_day)):
 
         
 
-
-# In[16]:
-
-
-#dataframe_collection[4][dataframe_collection[4].co2 <= 10000]
 
