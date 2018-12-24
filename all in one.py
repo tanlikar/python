@@ -182,7 +182,7 @@ def myFunc(month, date):
 
 
 
-    #plot PMV        
+    #plot PMV  with temp and humi on same axis
     fig, host = plt.subplots(figsize=(15,15))
     fig.subplots_adjust(right=0.75)
 
